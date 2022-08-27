@@ -42,6 +42,44 @@ const resolvers = {
     },
 
     Mutation: {
-        
+        login: async (parent, { email, password}) => {
+            const user = await User.findOne({ email});
+            if (!user) {
+                throw new AuthenticationError("Invalid credentials!");
+            }
+
+            const isPasswordCorrect = await user.isCorrectPassword(password);
+            if (!isPasswordCorrect) {
+                throw new AuthenticationError("Invalid credentials!");
+            }
+
+            const token = signToken(user);
+            return { token, user };
+        },
+        addUser: async (parent, args) => {
+            const user = await User.create(args);
+            const token = signToken(user);
+            return { token, user };
+        },
+        addCategory: async (parent, args) => {
+            const category = await Category.create(args);
+            return category;
+        },
+        addExpense: async (parent, args, context) => {
+            if(context.user) {
+                const expense = await Expense.create({ ...args, email: context.user.email });
+
+                await User.findByIdAndUpdate(
+                    { _id: context.user._id },
+                    { $push: { expenses: expense._id } },
+                    { new: true }
+                );
+                return expense;
+            }
+            throw new AuthenticationError("You must be logged in!");
+        }
+
     }
 };
+
+module.exports = resolvers;
