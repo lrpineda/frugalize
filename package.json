@@ -1,0 +1,23 @@
+{
+  "name": "frugalize",
+  "version": "1.0.0",
+  "description": "This project is based off the Trim-down project I worked with a team of developers.",
+  "main": "server/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lrpineda/frugalize.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lrpineda/frugalize/issues"
+  },
+  "homepage": "https://github.com/lrpineda/frugalize#readme",
+  "devDependencies": {
+    "concurrently": "^7.3.0"
+  }
+}
