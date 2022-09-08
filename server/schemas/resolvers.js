@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+const { AuthenticationError } = require("apollo-server-express");
 const { User, Expense, Category } = require("../models");
 const { signToken } = require("../utils/auth");
 
@@ -7,7 +7,7 @@ const resolvers = {
         me: async (parent, args, context) => {
             if (context.user){
                 const userData = await User.findOne({ _id: context.user._id })
-                    .Select('-__v -password')
+                    .select('-__v -password')
                     .populate('expenses');
                 return userData;
             }
@@ -16,12 +16,12 @@ const resolvers = {
 
         users: async () => {
             return User.find()
-                .Select('-__v -password')
+                .select('-__v -password')
                 .populate('expenses');
         },
         user: async (parent, { email}) => {
             return User.findOne({ email })
-                .Select('-__v -password')
+                .select('-__v -password')
                 .populate('expenses');
         },
         expenses: async (parent, { email }) => {
@@ -34,9 +34,8 @@ const resolvers = {
             return Expense.findById(_id);
         },
 
-        categories: async (parent, { email }) => {
-            const params = email ? { email } : {};
-            return Category.find(params);
+        categories: async () => {
+            return await Category.find();
         }
 
     },
@@ -67,7 +66,11 @@ const resolvers = {
         },
         addExpense: async (parent, args, context) => {
             if(context.user) {
-                const expense = await Expense.create({ ...args, email: context.user.email });
+                const expense = await Expense.create({
+                    expenseName: args.expenseName,
+                    expenseAmount: args.expenseAmount,
+                    category: args.categoryId,
+                });
 
                 await User.findByIdAndUpdate(
                     { _id: context.user._id },

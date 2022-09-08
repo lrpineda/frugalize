@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express';
+const { gql } = require('apollo-server-express');
 
 // Define the schema using the GraphQL schema language
 const typeDefs = gql` 
@@ -11,17 +11,16 @@ const typeDefs = gql`
         email: String
         expenses: [Expense]
     }
+    type Category {
+        _id: ID
+        name: String
+    }
     type Expense {
         _id: ID
         expenseName: String
         expenseAmount: Float
         expenseDate: String
         category: Category
-    }
-    type Category {
-        _id: ID
-        name: String
-        expenses: [Expense]
     }
     
     type Query {
@@ -30,7 +29,7 @@ const typeDefs = gql`
         user(email: String!): User
         expenses(email: String!): [Expense]
         expense(id: ID!): Expense
-        categories(email: String!): [Category]
+        categories: [Category]
 
     }
 
@@ -42,3 +41,5 @@ const typeDefs = gql`
     }
 
 `;
+
+module.exports = typeDefs;
