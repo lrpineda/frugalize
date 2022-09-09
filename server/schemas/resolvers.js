@@ -8,7 +8,10 @@ const resolvers = {
             if (context.user){
                 const userData = await User.findOne({ _id: context.user._id })
                     .select('-__v -password')
-                    .populate('expenses');
+                    .populate({
+                        path: 'expenses',
+                        populate: 'category'
+                    });
                 return userData;
             }
             throw new AuthenticationError("You must be logged in!");
@@ -17,16 +20,22 @@ const resolvers = {
         users: async () => {
             return User.find()
                 .select('-__v -password')
-                .populate('expenses');
+                .populate({
+                    path: 'expenses',
+                    populate: 'category'
+                });
         },
         user: async (parent, { email}) => {
             return User.findOne({ email })
                 .select('-__v -password')
-                .populate('expenses');
+                .populate({
+                    path: 'expenses',
+                    populate: 'category'
+                });
         },
         expenses: async (parent, { email }) => {
             const params = email ? { email } : {};
-            return Expense.find(params).sort({ expenseDate: -1 });
+            return Expense.find(params).populate('category').sort({ expenseDate: -1 });
 
         },
 
