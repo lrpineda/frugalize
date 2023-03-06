@@ -1,20 +1,26 @@
-const { Schema, model } = require('mongoose');
-const bcrypt = require("bcrypt");
+import { Schema, model, Document } from "mongoose";
+import bcrypt from 'bcrypt'
+
+interface IUser extends Document {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    isCorrectPassword: (password: string) => Promise<boolean>;
+}
 
 const userSchema = new Schema({
     email: {
         type: String,
         required: true,
         unique: true,
-        match: [/.+@.+\..+/, "Must match an email address!"],
+        match: [/.+@.+\..+/, "Must match an email address!"]
     },
-
     password: {
         type: String,
         required: true,
         minlength: [8, "Password must be at least 8 characters long!"],
     },
-
     firstName: {
         type: String,
         required: true,
@@ -24,16 +30,13 @@ const userSchema = new Schema({
         required: true,
     },
 
-    expenses: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Expense",
-        }
-    ]
+
+}, {
+    versionKey: false,
 });
 
-// Set up middleware
-userSchema.pre("save", async function (next) {
+// Set up pre-save middleware to create password
+userSchema.pre('save', async function (next) {
     if (this.isNew || this.isModified("password")) {
         const saltRounds = 10;
         this.password = await bcrypt.hash(this.password, saltRounds);
@@ -42,10 +45,10 @@ userSchema.pre("save", async function (next) {
 });
 
 // Compare password
-userSchema.methods.isCorrectPassword = async function (password) {
+userSchema.methods.isCorrectPassword = async function (password: string) {
     return await bcrypt.compare(password, this.password);
-};
+}
 
-const User = model("User", userSchema);
+const User = model<IUser>("User", userSchema);
 
-module.exports = User;
+export {User};

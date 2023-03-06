@@ -1,7 +1,6 @@
-const { gql } = require('apollo-server-express');
+import { gql } from "apollo-server-express";
 
-// Define the schema using the GraphQL schema language
-const typeDefs = gql` 
+const typeDefs = gql`
     type Auth {
         token: ID!
         user: User
@@ -9,7 +8,8 @@ const typeDefs = gql`
     type User {
         _id: ID
         email: String
-        expenses: [Expense]
+        firstName: String
+        lastName: String
     }
     type Category {
         _id: ID
@@ -17,29 +17,29 @@ const typeDefs = gql`
     }
     type Expense {
         _id: ID
-        expenseName: String
-        expenseAmount: Float
-        expenseDate: String
+        name: String
+        amount: Float
+        date: String
         category: Category
+
     }
-    
+
     type Query {
         me: User
         users: [User]
         user(email: String!): User
         expenses(email: String!): [Expense]
-        expense(id: ID!): Expense
+        expense(_id: ID!): Expense
         categories: [Category]
-
     }
 
     type Mutation {
         login(email: String!, password: String!): Auth
-        addCategory(name: String!): Category
         addUser(email: String!, password: String!, firstName: String!, lastName: String!): Auth
-        addExpense(expenseName: String!, expenseAmount: Float!, categoryId: ID!): Expense
+        addExpense(name: String!, amount: Float!, category: ID!): Expense
+        addCategory(name: String!): Category
     }
 
 `;
 
-module.exports = typeDefs;
+export default typeDefs;
